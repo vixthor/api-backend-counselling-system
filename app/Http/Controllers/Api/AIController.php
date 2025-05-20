@@ -75,21 +75,50 @@ class AIController extends Controller{
 
         return response()->json($response->json());
     }
+
+
     public function chat(Request $request)
     {
-        $message = $request->input('message', 'Hello!');
-
-        $response = Http::withHeaders([
-            'HTTP-Referer' => config('ai.referer'),
-        ])->post(config('ai.url'), [
-            'model' => config('ai.model'),
-            'messages' => [
-                ['role' => 'user', 'content' => $message]
-            ]
+        $request->validate([
+            'message' => 'required|string',
         ]);
 
-        return response()->json($response->json());
+        $response = Http::withToken(env('OPENAI_API_KEY'))
+            ->post('https://api.openai.com/v1/chat/completions', [
+                'model' => 'gpt-3.5-turbo', // or 'gpt-4'
+                'messages' => [
+                    ['role' => 'system', 'content' => 'You are a helpful counselor assistant.'],
+                    ['role' => 'user', 'content' => $request->message],
+                ],
+            ]);
+
+        if ($response->successful()) {
+            return response()->json([
+                'reply' => $response['choices'][0]['message']['content'],
+            ]);
+        }
+
+        return response()->json([
+            'error' => 'AI response failed.',
+            'details' => $response->json(),
+        ], $response->status());
     }
+
+    // public function chat(Request $request)
+    // {
+    //     $message = $request->input('message', 'Hello!');
+
+    //     $response = Http::withHeaders([
+    //         'HTTP-Referer' => config('ai.referer'),
+    //     ])->post(config('ai.url'), [
+    //         'model' => config('ai.model'),
+    //         'messages' => [
+    //             ['role' => 'user', 'content' => $message]
+    //         ]
+    //     ]);
+
+    //     return response()->json($response->json());
+    // }
 }
 
 

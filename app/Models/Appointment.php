@@ -9,7 +9,13 @@ class Appointment extends Model
 {
     use HasFactory;
 
-    // protected $fillable = ['student_id', 'counselor_id', 'scheduled_time'];
+    protected $fillable = ['student_id', 'counselor_id',
+        'session_topic',   // ✅ Make sure this is here
+        'preferred_date',
+        'preferred_time',
+        'notes',
+        'email',
+        'status',];
 
     public function student()
     {
