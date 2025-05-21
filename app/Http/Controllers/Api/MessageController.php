@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Models\User;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -62,5 +63,25 @@ class MessageController extends Controller
         ]);
 
         return response()->json($message);
+    }
+    public function studentsWithHistory($counselorId)
+    {
+        // Get unique student_ids who have messaged with this counselor
+        $studentIds = Message::where('receiver_id', $counselorId)
+            ->orWhere('sender_id', $counselorId)
+            ->pluck('sender_id', 'receiver_id')
+            ->flatten()
+            ->unique()
+            ->toArray();
+
+        // Remove the counselor's own ID from the list
+        $studentIds = array_filter($studentIds, fn($id) => $id != $counselorId);
+
+        // Fetch student users
+        $students = User::whereIn('id', $studentIds)
+            ->where('role', 'student')
+            ->get();
+
+        return response()->json($students);
     }
 }

@@ -12,21 +12,24 @@ use App\Http\Controllers\Api\CounselorController;
 use App\Http\Controllers\Api\AppointmentController;
 use App\Http\Controllers\Api\ConversationController;
 
-Route::post('/students/schedule', [StudentController::class, 'scheduleAppointment']);
+// Route::post('/students/schedule', [StudentController::class, 'scheduleAppointment']);
 Route::post('/counselors/{counselor}/availability', [CounselorController::class, 'setAvailability']);
 Route::get('/appointments/{appointment}/confirm', [AppointmentController::class, 'confirm']);
 Route::post('/appointments', [AppointmentController::class, 'store']);
 Route::get('/appointments/{id}', [AppointmentController::class, 'show']);
+Route::get('/appointments/{id}', [AppointmentController::class, 'showAppointment']);
 Route::get('/appointmentslist', [AppointmentController::class, 'index']);
 // Route::post('/conversations/start', [ConversationController::class, 'start']);
-Route::post('/ai/process', [AIController::class, 'processInput']);
+// Route::post('/ai/process', [AIController::class, 'processInput']);
 
-Route::post('/ask', [GeminiController::class, 'askGemini']);
+// Route::post('/ask', [GeminiController::class, 'askGemini']);
 
 Route::post('/ask-openai', [AIController::class, 'askOpenAI']);
 Route::post('/ask-gemini', [AIController::class, 'askGemini']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/messages/students-with-history/{counselorId}', [MessageController::class, 'studentsWithHistory']);
 
+Route::get('/students/{id}', [StudentController::class, 'show']);
 // Route::prefix('conversations')->group(function () {
 //     Route::post('/start', [ConversationController::class, 'startConversation']); // Start a conversation
 //     Route::get('/{id}', [ConversationController::class, 'getConversation']); // Get conversation details
@@ -40,9 +43,9 @@ Route::post('/login', [AuthController::class, 'login']);
 //     Route::delete('/goals/{id}', [GoalController::class, 'destroy']); // Delete a goal
 //     Route::get('/goals/{id}/progress', [GoalController::class, 'trackProgress']); // Track progress
 // });
-Route::post('/ai/gemini-25', [AIController::class, 'gemini25Chat']);
+// Route::post('/ai/gemini-25', [AIController::class, 'gemini25Chat']);
 
-Route::post('/chat', [AIController::class, 'chat'])->middleware('throttle:ai-chat');;
+// Route::post('/chat', [AIController::class, 'chat'])->middleware('throttle:ai-chat');;
 
 Route::get('/counselors', [CounselorController::class, 'index']);
 Route::get('/counselors/{id}', [CounselorController::class, 'show']);
@@ -51,7 +54,7 @@ Route::patch('/counselors/{id}/status', [CounselorController::class, 'updateStat
 Route::post('/messages', [MessageController::class, 'send']);
 Route::get('/messages/{user_id}', [MessageController::class, 'index']);
 Route::middleware('auth:sanctum')->patch('/student/settings/{id}', [AuthController::class, 'updateStudentSettingsById']);
-Route::post('/deepseek/chat', [DeepSeekController::class, 'chat']);
+// Route::post('/deepseek/chat', [DeepSeekController::class, 'chat']);
 // Route::prefix('auth')->group(function () {
 //     Route::post('login', [AuthController::class, 'login']);
 
@@ -61,3 +64,5 @@ Route::post('/deepseek/chat', [DeepSeekController::class, 'chat']);
 //     });
 // });
 Route::get('/appointments/user/{id}', [AppointmentController::class, 'indexById']);
+Route::patch('/appointments/{id}', [AppointmentController::class, 'update']);
+Route::delete('/appointments/{id}', [AppointmentController::class, 'destroy']);

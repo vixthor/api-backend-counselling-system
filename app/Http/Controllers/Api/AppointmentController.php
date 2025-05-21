@@ -60,6 +60,19 @@ class AppointmentController extends Controller
             'counselor_name' => $appointment->counselor->name,
         ]);
     }
+
+    public function showAppointment($id)
+    {
+        $appointment = Appointment::with(['student', 'counselor'])->find($id);
+
+        if (!$appointment) {
+            return response()->json(['error' => 'Appointment not found'], 404);
+        }
+
+        return response()->json($appointment);
+    }
+
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -88,5 +101,35 @@ class AppointmentController extends Controller
             'message' => 'Appointment request sent successfully.',
             'data'    => $appointment,
         ], 201);
+    }
+
+    // PATCH /appointments/{id} - Accept (update status)
+    public function update(Request $request, $id)
+    {
+        $appointment = Appointment::findOrFail($id);
+
+        // Only allow values that match the enum in the migration
+        $request->validate([
+            'status' => 'required|in:Approved,Rejected,Pending',
+        ]);
+
+        $appointment->status = $request->status;
+        $appointment->save();
+
+        return response()->json([
+            'message' => 'Appointment status updated successfully.',
+            'appointment' => $appointment,
+        ]);
+    }
+
+    // DELETE /appointments/{id} - Reject (delete)
+    public function destroy($id)
+    {
+        $appointment = Appointment::findOrFail($id);
+        $appointment->delete();
+
+        return response()->json([
+            'message' => 'Appointment deleted successfully.',
+        ]);
     }
 }

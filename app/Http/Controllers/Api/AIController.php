@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
+use App\Models\Message;
 
 use Gemini\Laravel\Facades\Gemini;
 
@@ -25,10 +26,12 @@ class AIController extends Controller{
     }
 
     // Add this function for OpenAI GPT chat integration
-    function askOpenAI(Request $request)
+    public function askOpenAI(Request $request)
     {
         $request->validate([
-            'prompt' => 'required|string'
+            'messages' => 'required|array|min:1',
+            'messages.*.role' => 'required|string|in:system,user,assistant',
+            'messages.*.content' => 'required|string',
         ]);
 
         $apiKey = env('OPENAI_API_KEY');
@@ -37,19 +40,31 @@ class AIController extends Controller{
             'Content-Type' => 'application/json',
         ])->post('https://api.openai.com/v1/chat/completions', [
             'model' => 'gpt-3.5-turbo',
-            'messages' => [
-                [
-                    'role' => 'user',
-                    'content' => $request->prompt
-                ]
-            ],
+            'messages' => $request->messages,
             'max_tokens' => 512,
         ]);
 
         if ($response->successful()) {
             $data = $response->json();
+            $aiReply = $data['choices'][0]['message']['content'] ?? '';
+
+            // Store the AI message in the database
+            // You need to know the student and counselor IDs (pass them in the request if needed)
+            $studentId = $request->input('student_id');
+            $counselorId = $request->input('counselor_id');
+
+            if ($studentId && $counselorId) {
+                Message::create([
+                    'sender_id' => 'ai', // or a dedicated AI user ID
+                    'receiver_id' => $studentId, // or $counselorId depending on your logic
+                    'content' => $aiReply,
+                    'student_id' => $studentId,
+                    'counselor_id' => $counselorId,
+                ]);
+            }
+
             return response()->json([
-                'answer' => $data['choices'][0]['message']['content'] ?? ''
+                'answer' => $aiReply
             ]);
         }
 
