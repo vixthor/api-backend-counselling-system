@@ -135,29 +135,27 @@ class AuthController extends Controller
     {
         $user = User::find($id);
         if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
+            return response()->json(['error' => 'User not found'], 404);
         }
 
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email',
-            'current_password' => 'nullable|string',
-            'new_password' => 'nullable|string|min:6',
-            'confirm_password' => 'nullable|string|same:new_password',
+        // Validate and update fields as needed
+        $validated = $request->validate([
+            'name' => 'sometimes|string',
+            'email' => 'sometimes|email',
+            // Add other fields as needed
         ]);
 
-        $user->name = $data['name'];
-        $user->email = $data['email'];
+        $user->update($validated);
 
-        if (!empty($data['current_password']) && !empty($data['new_password']) && !empty($data['confirm_password'])) {
-            if (!\Hash::check($data['current_password'], $user->password)) {
-                return response()->json(['message' => 'Current password is incorrect'], 422);
+        // Handle password change if provided
+        if ($request->filled('current_password') && $request->filled('new_password')) {
+            if (!\Hash::check($request->current_password, $user->password)) {
+                return response()->json(['error' => 'Current password is incorrect'], 400);
             }
-            $user->password = bcrypt($data['new_password']);
+            $user->password = bcrypt($request->new_password);
+            $user->save();
         }
 
-        $user->save();
-
-        return response()->json(['message' => 'Profile updated successfully', 'user' => $user]);
+        return response()->json(['message' => 'Profile updated successfully!', 'user' => $user]);
     }
 }

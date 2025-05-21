@@ -53,7 +53,7 @@ Route::patch('/counselors/{id}/status', [CounselorController::class, 'updateStat
 
 Route::post('/messages', [MessageController::class, 'send']);
 Route::get('/messages/{user_id}', [MessageController::class, 'index']);
-Route::middleware('auth:sanctum')->patch('/student/settings/{id}', [AuthController::class, 'updateStudentSettingsById']);
+Route::patch('/student/settings/{id}', [AuthController::class, 'updateStudentSettingsById']);
 // Route::post('/deepseek/chat', [DeepSeekController::class, 'chat']);
 // Route::prefix('auth')->group(function () {
 //     Route::post('login', [AuthController::class, 'login']);
