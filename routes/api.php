@@ -30,6 +30,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/messages/students-with-history/{counselorId}', [MessageController::class, 'studentsWithHistory']);
 
 Route::get('/students/{id}', [StudentController::class, 'show']);
+Route::post('/logout', [App\Http\Controllers\Api\AuthController::class, 'logout']);
 // Route::prefix('conversations')->group(function () {
 //     Route::post('/start', [ConversationController::class, 'startConversation']); // Start a conversation
 //     Route::get('/{id}', [ConversationController::class, 'getConversation']); // Get conversation details

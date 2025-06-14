@@ -158,4 +158,12 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Profile updated successfully!', 'user' => $user]);
     }
+
+    public function logout(Request $request)
+    {
+        // Log out the user from the web guard
+        auth()->logout();
+
+        return response()->json(['message' => 'Logged out successfully']);
+    }
 }
