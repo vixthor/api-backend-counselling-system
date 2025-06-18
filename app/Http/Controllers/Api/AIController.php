@@ -11,19 +11,19 @@ use Gemini\Laravel\Facades\Gemini;
 
 
 class AIController extends Controller{
-    function askGemini(Request $request)
-    {
-        $request->validate([
-            'question' => 'required|string'
-        ]);
+    // function askGemini(Request $request)
+    // {
+    //     $request->validate([
+    //         'question' => 'required|string'
+    //     ]);
 
-        // Use Gemini 2.5 Flash Preview model
-        $response = Gemini::geminiFlashPreview()->generateContent($request->question);
+    //     // Use Gemini 2.5 Flash Preview model
+    //     $response = Gemini::geminiFlashPreview()->generateContent($request->question);
 
-        return response()->json([
-            'answer' => $response->text()
-        ]);
-    }
+    //     return response()->json([
+    //         'answer' => $response->text()
+    //     ]);
+    // }
 
     // Add this function for OpenAI GPT chat integration
     public function askOpenAI(Request $request)
@@ -74,50 +74,50 @@ class AIController extends Controller{
         ], 500);
     }
 
-    public function gemini25Chat(Request $request)
-    {
-        $message = $request->input('message');
+    // public function gemini25Chat(Request $request)
+    // {
+    //     $message = $request->input('message');
 
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . config('ai.api_key'),
-            'HTTP-Referer' => config('ai.referer'),
-        ])->post(config('ai.api_url'), [
-            'model' => config('ai.model'),
-            'messages' => [
-                ['role' => 'user', 'content' => $message]
-            ]
-        ]);
+    //     $response = Http::withHeaders([
+    //         'Authorization' => 'Bearer ' . config('ai.api_key'),
+    //         'HTTP-Referer' => config('ai.referer'),
+    //     ])->post(config('ai.api_url'), [
+    //         'model' => config('ai.model'),
+    //         'messages' => [
+    //             ['role' => 'user', 'content' => $message]
+    //         ]
+    //     ]);
 
-        return response()->json($response->json());
-    }
+    //     return response()->json($response->json());
+    // }
 
 
-    public function chat(Request $request)
-    {
-        $request->validate([
-            'message' => 'required|string',
-        ]);
+    // public function chat(Request $request)
+    // {
+    //     $request->validate([
+    //         'message' => 'required|string',
+    //     ]);
 
-        $response = Http::withToken(env('OPENAI_API_KEY'))
-            ->post('https://api.openai.com/v1/chat/completions', [
-                'model' => 'gpt-3.5-turbo', // or 'gpt-4'
-                'messages' => [
-                    ['role' => 'system', 'content' => 'You are a helpful counselor assistant.'],
-                    ['role' => 'user', 'content' => $request->message],
-                ],
-            ]);
+    //     $response = Http::withToken(env('OPENAI_API_KEY'))
+    //         ->post('https://api.openai.com/v1/chat/completions', [
+    //             'model' => 'gpt-3.5-turbo', // or 'gpt-4'
+    //             'messages' => [
+    //                 ['role' => 'system', 'content' => 'You are a helpful counselor assistant.'],
+    //                 ['role' => 'user', 'content' => $request->message],
+    //             ],
+    //         ]);
 
-        if ($response->successful()) {
-            return response()->json([
-                'reply' => $response['choices'][0]['message']['content'],
-            ]);
-        }
+    //     if ($response->successful()) {
+    //         return response()->json([
+    //             'reply' => $response['choices'][0]['message']['content'],
+    //         ]);
+    //     }
 
-        return response()->json([
-            'error' => 'AI response failed.',
-            'details' => $response->json(),
-        ], $response->status());
-    }
+    //     return response()->json([
+    //         'error' => 'AI response failed.',
+    //         'details' => $response->json(),
+    //     ], $response->status());
+    // }
 
     // public function chat(Request $request)
     // {
